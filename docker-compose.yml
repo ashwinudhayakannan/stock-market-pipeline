@@ -8,6 +8,11 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW_UID: ${AIRFLOW_UID}
+    AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+    AIRFLOW__SMTP__SMTP_USER: ashwinat032@gmail.com
+    AIRFLOW__SMTP__SMTP_PASSWORD: lfux ophd blzo julj
+    AIRFLOW__SMTP__SMTP_PORT: 587
+    AIRFLOW__SMTP__SMTP_MAIL_FROM: ashwinat032@gmail.com
   volumes:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
