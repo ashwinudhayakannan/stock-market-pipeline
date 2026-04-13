@@ -16,7 +16,8 @@ default_args = {
     "owner":            "ashwin",
     "retries":          2,
     "retry_delay":      timedelta(seconds=20),
-    "email_on_failure": False,
+    "email_on_failure": True,
+    "email":            ["ashwinat032@email.com"],
 }
 
 def extract_and_push(**context):
@@ -51,7 +52,7 @@ with DAG(
     description="Daily stock price ELT pipeline",
     default_args=default_args,
     start_date=days_ago(1),
-    schedule_interval="0 18 * * 1-5",  # 6PM every weekday
+    schedule_interval="0 * * * *",  # 6PM every weekday
     catchup=False,
     tags=["finance", "stocks", "elt"]
 ) as dag:
