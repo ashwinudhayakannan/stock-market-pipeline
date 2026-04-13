@@ -1,0 +1,4 @@
+{
+  "tickers": ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"],
+  "api_base_url": "https://www.alphavantage.co/query"
+}
