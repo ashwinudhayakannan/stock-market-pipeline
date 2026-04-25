@@ -37,6 +37,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./sql/init_stock_db.sql:/docker-entrypoint-initdb.d/init_stock_db.sql
       - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
