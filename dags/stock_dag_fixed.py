@@ -23,7 +23,6 @@ default_args = {
 
 def extract_and_push(**context):
     df = extract_all_tickers()
-    # Push to XCom so the load task can pull it
     context["ti"].xcom_push(key="raw_df", value=df.to_json())
 
 def load_from_xcom(**context):
@@ -35,16 +34,13 @@ def load_from_xcom(**context):
     load_raw(df)
 
 def quality_check(**context):
-    """Fail the DAG if row count is 0 or close_price has nulls."""
     import pandas as pd
     raw_json = context["ti"].xcom_pull(key="raw_df", task_ids="extract")
     import io
     df = pd.read_json(io.StringIO(raw_json))
-
     assert len(df) > 0, "Quality check failed: DataFrame is empty"
     assert df["close_price"].notnull().all(), "Quality check failed: nulls in close_price"
     assert (df["close_price"] > 0).all(), "Quality check failed: non-positive close prices"
-
     import logging
     logging.getLogger(__name__).info(f"Quality check passed: {len(df)} rows, no nulls")
 
@@ -53,14 +49,12 @@ with DAG(
     description="Daily stock price ELT pipeline",
     default_args=default_args,
     start_date=days_ago(1),
-    schedule_interval="0 * * * *",  # 6PM every weekday
+    schedule_interval="0 * * * *",
     catchup=False,
     tags=["finance", "stocks", "elt"]
 ) as dag:
 
-    t_start = EmptyOperator(
-        task_id="start"
-    )
+    t_start = EmptyOperator(task_id="start")
 
     t_extract = PythonOperator(
         task_id="extract",
@@ -94,5 +88,4 @@ with DAG(
 
     t_end = EmptyOperator(task_id="end")
 
-    # Task dependency chain
-    t_start >> t_extract >> t_quality >> t_load >> t_transform >> t_end
+    t_start >> t_extract >> t_quality >> t_load >> t_transform >> t_export_csv >> t_end
